@@ -1,3 +1,3 @@
 # Use of physics informed neural networks to solve heat conduction in one and two dimensions
 
-This code is used to solver semi-infinity solid problem
+This code is used to solver semi-infinity solid problem in 1D and 2D
