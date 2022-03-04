@@ -1,10 +1,11 @@
 from sympy import Symbol, Eq
 import numpy as np
 from scipy.special import erf
+import tensorflow as tf
 
 from modulus.solver import Solver
-from modulus.dataset import TrainDomain, ValidationDomain
-from modulus.data import Validation
+from modulus.dataset import TrainDomain, ValidationDomain, MonitorDomain
+from modulus.data import Validation, Monitor
 from modulus.sympy_utils.geometry_1d import Line1D
 from modulus.controller import ModulusController
 
@@ -12,7 +13,7 @@ from heat_equation import HeatEquation1D
 from rnn import GRUArch
 
 # domain parameters
-L = 0.03			# m
+L = 0.1			# m
 Ti = 100.0      # C
 Ts = 25.0       # C
 
@@ -70,7 +71,7 @@ class HeatVal(ValidationDomain):
     super(HeatVal, self).__init__()
     # make validation data
     deltaTT = 0.005
-    deltaX = 0.00015
+    deltaX = 0.0005
     x = np.arange(0, L, deltaX)
     t = np.arange(0, time_length, deltaTT)
     X, TT = np.meshgrid(x, t)
@@ -86,11 +87,25 @@ class HeatVal(ValidationDomain):
     val = Validation.from_numpy(invar_numpy, outvar_numpy)
     self.add(val, name='Val')
 
+
+class HeatMonitor(MonitorDomain):
+  def __init__(self, **config):
+    super(HeatMonitor, self).__init__()
+    x = Symbol('x')
+    
+    # metric for peak temp
+    temp_monitor = Monitor(geo.sample_interior(100, bounds={x: (0, L)}, param_ranges={t_symbol: (0,1)}),
+                         {'peak_temp': lambda var: tf.reduce_max(var['T'])})
+    self.add(temp_monitor, 'PeakTempMonitor')
+
+
 # Define neural network
 class HeatSolver(Solver):
   train_domain = HeatTrain
   val_domain = HeatVal
+  monitor_domain = HeatMonitor
   arch = GRUArch
+
 
   def __init__(self, **config):
     super(HeatSolver, self).__init__(**config)
@@ -106,7 +121,7 @@ class HeatSolver(Solver):
   def update_defaults(cls, defaults):
     defaults.update({
         'network_dir': './network_checkpoint_heat',
-        'max_steps': 200000,
+        'max_steps': 150000,
         'decay_steps': 1000,
         'nr_layers':3,
         'layer_size':256
@@ -115,3 +130,4 @@ class HeatSolver(Solver):
 if __name__ == '__main__':
   ctr = ModulusController(HeatSolver)
   ctr.run()
+  

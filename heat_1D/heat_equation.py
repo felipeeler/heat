@@ -42,4 +42,3 @@ class HeatEquation1D(PDES):
     # set equations
     self.equations = Variables()
     self.equations['heat_equation'] = T.diff(t, 1) - alpha * T.diff(x,2)
-    

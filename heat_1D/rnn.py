@@ -330,3 +330,4 @@ class GRUArch(Arch):
     x = fc_layer(x, _length_key_list(output_keys), activation_fn=None, name='fc_final') # no weight norm on last layer
 
     return Variables.from_tensor(x, output_keys)
+    
