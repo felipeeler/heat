@@ -97,6 +97,10 @@ class HeatMonitor(MonitorDomain):
     temp_monitor = Monitor(geo.sample_interior(100, bounds={x: (0, L)}, param_ranges={t_symbol: (0,1)}),
                          {'peak_temp': lambda var: tf.reduce_max(var['T'])})
     self.add(temp_monitor, 'PeakTempMonitor')
+    
+    temp_monitor2 = Monitor(geo.sample_interior(100, bounds={x: (0, L)}, param_ranges={t_symbol: (0,1)}),
+                         {'low_peak_temp': lambda var: tf.reduce_min(var['T'])})
+    self.add(temp_monitor2, 'LowPeakTempMonitor')
 
 
 # Define neural network
@@ -121,8 +125,8 @@ class HeatSolver(Solver):
   def update_defaults(cls, defaults):
     defaults.update({
         'network_dir': './network_checkpoint_heat',
-        'max_steps': 150000,
-        'decay_steps': 1000,
+        'max_steps': 300000,
+        'decay_steps': 3000,
         'nr_layers':3,
         'layer_size':256
         })
@@ -130,4 +134,3 @@ class HeatSolver(Solver):
 if __name__ == '__main__':
   ctr = ModulusController(HeatSolver)
   ctr.run()
-  
