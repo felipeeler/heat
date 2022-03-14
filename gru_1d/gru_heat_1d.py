@@ -12,6 +12,9 @@ from modulus.controller import ModulusController
 from heat_equation import HeatEquation1D
 from rnn import GRUArch
 
+# fixing the random seed for the weights generation:
+np.random.seed(1)
+
 # domain parameters
 L = 0.1			# m
 Ti = 100.0      # C

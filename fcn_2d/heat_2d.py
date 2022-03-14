@@ -10,6 +10,9 @@ from modulus.sympy_utils.geometry_2d import Rectangle
 from heat_equation import HeatEquation2D
 from modulus.controller import ModulusController
 
+# fixing the random seed for the weights generation:
+np.random.seed(1)
+
 # params for domain
 height = 1.0
 width = 1.0
@@ -109,9 +112,9 @@ class Heat2DSolver(Solver):
     defaults.update({
         'network_dir': './network_checkpoint_heat_2d',
         'decay_steps': 8000,
-        'max_steps': 800000,
-        'nr_layers':4,
-        'layer_size':256
+        'max_steps': 300000,
+        'nr_layers':6,
+        'layer_size':64
     })
 
 
